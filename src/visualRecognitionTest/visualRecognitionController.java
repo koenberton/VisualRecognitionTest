@@ -15,7 +15,7 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 	private gpUtils xU = null;
 	private gpPrintStream sout = null;
 	
-	JTextField textField = null;   // wordt gebruikt als callback
+	JTextField textField = null;   // is used as a callback
 	private boolean isOK = true;
 	private String application=null;
 	private String currentImageFileName=null;
