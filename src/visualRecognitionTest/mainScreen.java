@@ -44,7 +44,6 @@ public class mainScreen {
 	private JButton btnInCorrect=null;
 	private JComboBox classifyCombo=null;
 	private JTextArea textAreaLeft =null;
-
 	
 	private int leftMargin = 20;
 	private int FRAMEBORDER = 35;
@@ -52,12 +51,18 @@ public class mainScreen {
 	private int imageWidth = -1;
 	private int imageHeigth = -1;
 	private String currentFileName;
-	private long startt=0L;
+	private	long startt=0L;
 	
+	private String BUILD = "VisualRecognitionTest 21-Mar-2017 V01";
 	private String ScriptName = "c:\\temp\\watsonTensorFlow.cmd";
 	private String OutputName = "c:\\temp\\watsonTensorFlow.txt";
 	private String ImageSourceFolder = "c:\\temp\\cmcProc";
 	
+	private String WatsonScriptFolder = "/tmp";
+	private String TensorScriptFolder = "/tmp";
+	private String APIKey = "1234abcd";
+	
+	private boolean initOK=true;
 	/**
 	 * Launch the application.
 	 */
@@ -87,9 +92,9 @@ public class mainScreen {
 		xU = new gpUtils();
 		//
 		if( xU.ctSlash == '/') {
+			initOK = readConfiguration();
 			ScriptName = "/tmp/watsonTensorFlow.cmd";
 			OutputName = "/tmp/watsonTensorFlow.txt";
-		    ImageSourceFolder = "/home/koen/beeldherkenning/fotoos" ;
 	    }
 		//
 		initialize();
@@ -109,7 +114,7 @@ public class mainScreen {
 				do_resize();
 			}
 		});
-		frame.setTitle("VisualRecognitionTest V01 - 20Mar2017");
+		frame.setTitle( BUILD );
 		frame.setBounds(100, 100, 800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -160,10 +165,14 @@ public class mainScreen {
 				ctrl.setScriptName(ScriptName);
 				ctrl.setImageName(currentFileName);
 				ctrl.setApplciation(classifyCombo.getSelectedItem().toString());
+				ctrl.setWatsonScriptFolder(WatsonScriptFolder);
+			    ctrl.setTensorScriptFolder(TensorScriptFolder);
+			    ctrl.setAPIKey(APIKey);
 			    startt = System.nanoTime();
 				ctrl.execute();
 			}
 		});
+		btnWatson.setEnabled(initOK);
 		frame.getContentPane().add(btnWatson);
 		//
 		btnCorrect = new JButton("Correct");
@@ -173,6 +182,7 @@ public class mainScreen {
 				//tensorStatus.setText("Querying");
 			}
 		});
+		btnCorrect.setEnabled(false);
 		frame.getContentPane().add(btnCorrect);
 		//
 		btnInCorrect = new JButton("Incorrect");
@@ -182,6 +192,7 @@ public class mainScreen {
 				//tensorStatus.setText("Querying");
 			}
 		});
+		btnInCorrect.setEnabled(false);
 		frame.getContentPane().add(btnInCorrect);
 		
 		// Ticker
@@ -454,4 +465,110 @@ public class mainScreen {
 		}
 		return "Error : Could not locate (score=";
 	}
+	
+	private boolean readConfiguration()
+	{
+		String userdir = System.getenv("HOME");
+		if( userdir == null ) userdir = "/tmp";
+		String ConfigName = userdir + "/VisualRecognitionTest.config";
+		if( xU.IsBestand(ConfigName) == false ) {
+			System.err.println("Cannot locate config file [" + ConfigName + "]");
+			return false;
+		}
+		String list = xU.ReadContentFromFile(ConfigName,1000,"ASCII");
+		if( list == null ) {
+			System.err.println("Cannot read config file [" + ConfigName + "]");
+			return false;
+		}
+		// JSON format
+		boolean isOK=true;
+		int naant=xU.TelDelims(list,'\n');
+		for(int i=0;i<=naant;i++)
+		{
+			String sLine = xU.GetVeld(list,(i+1),'\n');
+			if( sLine == null ) continue;
+			if( sLine.startsWith("#")) continue;
+			sLine = xU.Remplaceer(sLine," ","");
+			sLine = xU.Remplaceer(sLine,"\"","");
+			sLine = xU.Remplaceer(sLine,",","");
+			String sLow = sLine.toLowerCase();
+		    if( sLow.indexOf("watsonscriptfolder") >= 0) {
+		    	String sret = getPart2(sLine);
+		    	if( sret == null ) continue;
+		    	if( xU.IsDir(sret)  == false ) {
+		    		System.err.println("Cannot locate Watson script folder [" + sret + "]");
+		    		isOK=false;
+		    		continue;
+		    	}
+		    	WatsonScriptFolder = sret;
+		    	String jso = sret + "/myparams.json";
+		        if( xU.IsBestand(jso) == false ) {
+		    		System.err.println("Cannot locate Watson paam file [" + jso + "]");
+		    		isOK=false;
+		    		WatsonScriptFolder= "/tmp";
+		    		continue;
+		    	}			
+		    	System.out.println("WatsonscriptFolder [" + WatsonScriptFolder + "]");
+		    	continue;
+		    }
+		    if( sLow.indexOf("tensorflowscriptfolder") >= 0) {
+		    	String sret = getPart2(sLine);
+		    	if( sret == null ) continue;
+		    	if( xU.IsDir(sret) == false ) {
+		    		System.err.println("Cannot locate TensorFlow script folder [" + sret + "]");
+		    		isOK=false;
+		    		continue;
+		    	}
+		    	TensorScriptFolder = sret;
+		    	String Pyt= TensorScriptFolder + "/test_image.py";
+		    	if( xU.IsBestand(Pyt) == false ) {
+		    		System.err.println("Cannot locate TensorFlow main script [" + Pyt + "]");
+		    		isOK=false;
+		    		TensorScriptFolder= "/tmp";
+		    		continue;
+		    	}
+		    	System.out.println("TensorFlowScriptFolder [" + TensorScriptFolder + "]");
+                continue;
+		    }
+		    if( sLow.indexOf("imagetestfolder") >= 0) {
+		    	String sret = getPart2(sLine);
+		    	if( sret == null ) continue;
+		    	if( xU.IsDir(sret) == false ) {
+		    		System.err.println("Cannot locateimage test folder [" + sret + "]");
+		    		isOK=false;
+		    		continue;
+		    	}
+                ImageSourceFolder = sret;
+                System.out.println("Imagefolder [" + ImageSourceFolder + "]");
+		    	continue;
+		    }
+		    if( sLow.indexOf("apikey") >= 0) {
+		    	String sret = getPart2(sLine);
+		    	if( sret == null ) continue;
+		    	if (sret.length() < 10 ){
+		    		System.err.println("API Key is probably incorrect [" + sret + "]");
+		    		isOK=false;
+		    		continue;
+		    	}
+		    	APIKey = sret;
+		    	System.out.println("API-key [" + APIKey + "]");
+		    	continue;
+		    }
+
+		}
+		return isOK;
+	}
+	
+	private String getPart2(String sin)
+	{
+		String sLine = sin;
+		sLine = xU.Remplaceer(sLine," ","");
+		sLine = xU.Remplaceer(sLine,"\"","");
+		int idx = sLine.indexOf(":");
+		try {
+		  return sin.substring(idx+1).trim();
+		}
+		catch(Exception e) { return null; }
+	}
+	
 }
