@@ -114,7 +114,7 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 			sout.println( "cd /home/koen/beeldherkenning/Watson/USSouth" );
             sout.println( "curl -X POST -F \"images_file=@" + 
             		currentImageFileName + 
-            		"\" -F \"parameters=@myparams.json\" \"https://gateway-a.watsonplatform.net/visual-recognition/api/v3/classify?api_key=ebd3fb912e3531e5cd9aba8e1b6db42dbe347569&version=2016-12-01\""
+            		"\" -F \"parameters=@myparams.json\" \"https://gateway-a.watsonplatform.net/visual-recognition/api/v3/classify?api_key=3fb912e3531e5cd9aba8e1b6db42dbe347569&version=2016-12-01\""
                     );
            /*
 			 * 
