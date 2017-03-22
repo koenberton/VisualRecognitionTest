@@ -25,6 +25,7 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 	private String WatsonScriptFolder = null;
 	private String TensorScriptFolder = null;
 	private String APIKey = null;
+	private String ClassifierId = null;
 	
 	//---------------------------------------------------------------------------------
 	public void setScriptName(String sin)
@@ -54,6 +55,10 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 	public void setImageName(String sin)
 	{
 		currentImageFileName=sin;
+	}
+	public void setClassifierId(String sin)
+	{
+		ClassifierId = sin;
 	}
 	
 	//---------------------------------------------------------------------------------
@@ -89,7 +94,7 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 			 System.err.println("Application has not been set");
 			 return -1;
 		 }
-		 
+		 //
 		 System.out.println("Scriptname         [" + ScriptName + "]" );
 		 System.out.println("OutputName         [" + OutputName + "]" );
 		 System.out.println("Image              [" + currentImageFileName + "]" );
@@ -97,7 +102,7 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 		 System.out.println("Key                [" + APIKey + "]" );
 		 System.out.println("WatsonScriptFolder [" + WatsonScriptFolder + "]" );
 		 System.out.println("TensorFolder       [" + TensorScriptFolder + "]" );
-		 
+		 System.out.println("ClassifierId       [" + ClassifierId + "]");
 		 //
 	     if( application.compareToIgnoreCase("WATSON") == 0) isOK = do_watson();
 	     else
@@ -138,12 +143,12 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
             sout.println( 
             	    "curl -X POST -F \"images_file=@" + 
             		currentImageFileName + 
-            		"\" -F \"parameters=@myparams.json\"  " + 
+            		"\" -F \"parameters=@watsonparam.json\"  " + 
             		"\"https://gateway-a.watsonplatform.net/visual-recognition/api/v3/classify?api_key=" +
             		APIKey + 
             		"&version=2016-12-01\""
                     );
-           
+           createParamFile();
 		}
 		else {
 		 sout.println( "REM " + currentImageFileName );
@@ -151,6 +156,18 @@ public class visualRecognitionController extends SwingWorker<Integer, Integer> {
 		}
 		//
 		return closescript();
+	}
+	
+	
+	private boolean createParamFile()
+	{
+		String FileName =  WatsonScriptFolder + "/watsonparam.json";
+        gpPrintStream gp = new gpPrintStream(FileName,"ASCII");
+        gp.println("{");
+        gp.println("\"classifier_ids\" : [\"" + ClassifierId + "\",\"default\"]");
+        gp.println("}");
+        gp.close();
+		return true;
 	}
 	
 	//---------------------------------------------------------------------------------

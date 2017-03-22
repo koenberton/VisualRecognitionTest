@@ -53,7 +53,7 @@ public class mainScreen {
 	private String currentFileName;
 	private	long startt=0L;
 	
-	private String BUILD = "VisualRecognitionTest 21-Mar-2017 V01";
+	private String BUILD = "VisualRecognitionTest 22-Mar-2017 V01";
 	private String ScriptName = "c:\\temp\\watsonTensorFlow.cmd";
 	private String OutputName = "c:\\temp\\watsonTensorFlow.txt";
 	private String ImageSourceFolder = "c:\\temp\\cmcProc";
@@ -61,6 +61,7 @@ public class mainScreen {
 	private String WatsonScriptFolder = "/tmp";
 	private String TensorScriptFolder = "/tmp";
 	private String APIKey = "1234abcd";
+	private String ClassifierId = "unknown";
 	
 	private boolean initOK=true;
 	/**
@@ -168,6 +169,7 @@ public class mainScreen {
 				ctrl.setWatsonScriptFolder(WatsonScriptFolder);
 			    ctrl.setTensorScriptFolder(TensorScriptFolder);
 			    ctrl.setAPIKey(APIKey);
+			    ctrl.setClassifierId(ClassifierId);
 			    startt = System.nanoTime();
 				ctrl.execute();
 			}
@@ -552,6 +554,18 @@ public class mainScreen {
 		    	}
 		    	APIKey = sret;
 		    	System.out.println("API-key [" + APIKey + "]");
+		    	continue;
+		    }
+		    if( sLow.indexOf("classifierid") >= 0) {
+		    	String sret = getPart2(sLine);
+		    	if( sret == null ) continue;
+		    	if (sret.length() < 5 ){
+		    		System.err.println("classifier ID is probably incorrect [" + sret + "]");
+		    		isOK=false;
+		    		continue;
+		    	}
+		    	ClassifierId = sret;
+		    	System.out.println("Classifier ID [" + ClassifierId + "]");
 		    	continue;
 		    }
 
