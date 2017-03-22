@@ -14,10 +14,13 @@ Structured as follows
   "WatsonScriptFolder" : "/home/koen/beeldherkenning/Watson/USSouth" ,
   "TensorFlowScriptFolder" : "/home/koen/beeldherkenning/TensorFlow" ,
   "ImageTestFolder" : "/home/koen/beeldherkenning/fotoos" ,
-  "APIkey" : "1234567890abcdefghijklm"
+  "APIkey" : "1234567890abcdefghijklm" ,
+  "ClassifierId" : "classifier12_34567890"
   }
 
-Change requests :
-- ClassifierIds in Watson - generate myparam.json file
+22 March 2017
+Added the creation of a JSON parameter file comprising the classifier_ids for Watson
 
+Change requests :
+- none
 
